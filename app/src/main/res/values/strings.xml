@@ -12,11 +12,15 @@
     <string name="zero">0</string>
     <string name="dot">.</string>
     <string name="plus">+</string>
-    <string name="minus">-</string>
+    <string name="minus">–</string>
     <string name="multiply">×</string>
     <string name="divide">÷</string>
     <string name="equal">=</string>
     <string name="erase">⌫</string>
+    <string name="negate">+/-</string>
+    <string name="clear">C</string>
+    <string name="defaultValue">0</string>
+
 
 
 </resources>

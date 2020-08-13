@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
+
 public class MainActivity extends AppCompatActivity {
 
     Button btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9;
@@ -41,28 +43,51 @@ public class MainActivity extends AppCompatActivity {
             if(!bInput.equals("Infinity")) {
                 bInput = "";
                 operator = false;
+                solved = false;
             }
         }
         switch (in) {
             case "=":
-                if(!lastCharOp()) {
-                    solve();
-                    sInput += "=";
-                    sScreen.setText(sInput);
-                    bScreen.setText(bInput);
+                if(bInput.length()>0) {
+                   if (sInput.indexOf("=")==-1) {
+                        tempOp+=bInput;
+                        sInput+=bInput;
+                        solve();
+                        sInput += "=";
+                        sScreen.setText(sInput);
+                        bScreen.setText(bInput);
+                        solved=false;
+                    }
                 }
                 break;
             case ".":
                 if(bInput.length()>0) {
-                    if (!lastCharOp()) {
+                    if (bInput.indexOf(".")==-1) {
                         bInput += in;
-                        sInput += in;
-                        tempOp += in;
                         bScreen.setText(bInput);
                     }
                 }
                 break;
-
+            case "+/-":
+                if(bInput.length()>0){
+                    String c = bInput.substring(0,1);
+                    if(c.equals("-")){
+                        bInput = bInput.substring(1);
+                    }
+                    else {
+                        bInput = "-" + bInput;
+                    }
+                    bScreen.setText(bInput);
+                    if(sInput.indexOf("=")!=-1){
+                        if(bInput.indexOf(".")!=-1){
+                            tempOp = bInput;
+                        }
+                        else{
+                            tempOp = bInput + ".0";
+                        }
+                    }
+                }
+                break;
             case "⌫":
                 if(bInput.equals("Infinity")){}
                 else {
@@ -70,29 +95,93 @@ public class MainActivity extends AppCompatActivity {
                     int len2 = sInput.length();
                     int len3 = tempOp.length();
                     if (len1 > 0) {
-                        String s = bInput.substring(0, len1 - 1);
-                        bInput = s;
-                        s = sInput.substring(0, len2 - 1);
-                        sInput = s;
-                        s = tempOp.substring(0, len3 - 1);
-                        tempOp = s;
-                        bScreen.setText(bInput);
+                        if(len2 > 0) {
+                            if (!sInput.substring(len2 - 1).equals("=")) {
+                                String s = bInput.substring(0, len1 - 1);
+                                bInput = s;
+                                s = sInput.substring(0, len2 - 1);
+                                sInput = s;
+                                s = tempOp.substring(0, len3 - 1);
+                                tempOp = s;
+                                bScreen.setText(bInput);
+                            }
+                        }
+                        else{
+                            String s = bInput.substring(0, len1 - 1);
+                            bInput = s;
+                            bScreen.setText(bInput);
+                        }
+                        if(bInput.equals("")){
+                            bScreen.setText(R.string.defaultValue);
+                        }
                     }
                 }
+                break;
+            case "C":
+                bInput = "";
+                sInput = "";
+                tempOp = "";
+                bScreen.setText(R.string.defaultValue);
+                sScreen.setText("");
                 break;
             default:
                 if (sInput == null) {
                     sInput = "";
                     bScreen.setText(sInput);
                 }
-                if ((in.equals("+") || in.equals("-") || in.equals("×") || in.equals("÷"))){
-                    int len = sInput.length()-1;
-                    if(!lastCharOp()){
-                        solve();
-                        tempOp += in;
+                if ((in.equals("+") || in.equals("–") || in.equals("×") || in.equals("÷"))){
+                    if (bInput.equals("Infinity")) {
+                        sInput = "";
+                        bInput = "";
+                        tempOp = "";
+                        sScreen.setText(sInput);
+                    }
+                    if(bInput.length()>0) {
+                        int len = sInput.length() - 1;
+                       // if (!lastCharOp()) {
+                        if(!solved) {
+                            if(bInput.indexOf("E")!=-1){
+                                sInput +=bInput;
+                            }
+                            else {
+                                BigDecimal bd = new BigDecimal(bInput);
+                                String t;
+                                t = (bd.stripTrailingZeros().toPlainString());
+                                sInput += t;
+                            }
+                        }
+                        if(sInput.indexOf("=")!=-1){
+                            if(bInput.indexOf("E")!=-1){
+                                sInput = bInput;
+                            }
+                            else {
+                                BigDecimal bd = new BigDecimal(bInput);
+                                String t;
+                                t = (bd.stripTrailingZeros().toPlainString());
+                                sInput = t;
+                            }
+                        }
+
+                        if(tempOp.indexOf(".")==-1) {
+                            tempOp += bInput;
+                            tempOp += in;
+                        }
+                        else if (tempOp.substring(tempOp.length()-1).equals("+") || tempOp.substring(tempOp.length()-1).equals("–") || tempOp.substring(tempOp.length()-1).equals("÷") || tempOp.substring(tempOp.length()-1).equals("×"))
+                        {
+                            tempOp += bInput;
+                            tempOp += in;
+                        }
+                        else{
+                            tempOp += in;
+                            if(!sInput.equals(bInput))
+                                tempOp += bInput;
+                        }
                         sInput += in;
+
+                        solve();
                         sScreen.setText(sInput);
                         operator = true;
+                        //}
                     }
                 }
                 else {
@@ -112,13 +201,20 @@ public class MainActivity extends AppCompatActivity {
                         sScreen.setText(sInput);
                         operator = false;
                     }
-                    bInput+=in;
-                    tempOp+=in;
-                    sInput+=in;
-                    bScreen.setText(bInput);
+                    if(in.equals("0") && bInput.length()>0 && Double.parseDouble(bInput)==0);
+                    else {
+                        if(bInput.length()>0 && Double.parseDouble(bInput)==0 ){
+                            bInput = in;
+                            bScreen.setText(bInput);
+                        }
+                        else {
+                            if(bInput.length()<10) {
+                                bInput += in;
+                                bScreen.setText(bInput);
+                            }
+                        }
+                    }
                 }
-
-
 
         }
 
@@ -126,12 +222,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void solve(){
         if(tempOp.split("×").length==2){
+            String c ="";
+            if(tempOp.substring(tempOp.length()-1).equals("+") || tempOp.substring(tempOp.length()-1).equals("–") || tempOp.substring(tempOp.length()-1).equals("÷") || tempOp.substring(tempOp.length()-1).equals("×")){
+                c = tempOp.substring(tempOp.length()-1);
+                tempOp = tempOp.substring(0,tempOp.length()-1);
+            }
             solved = true;
             String numbers[]=tempOp.split("×");
             try{
                 double mul=Double.parseDouble(numbers[0])*Double.parseDouble(numbers[1]);
                 bInput=mul+"";
-                tempOp=bInput;
+                tempOp=bInput+c;
             }
             catch (Exception e){
                 //Display error
@@ -139,12 +240,18 @@ public class MainActivity extends AppCompatActivity {
 
         }
         else if(tempOp.split("÷").length==2){
+            String c ="";
+            if(tempOp.substring(tempOp.length()-1).equals("+") || tempOp.substring(tempOp.length()-1).equals("–") || tempOp.substring(tempOp.length()-1).equals("÷") || tempOp.substring(tempOp.length()-1).equals("×")){
+                c = tempOp.substring(tempOp.length()-1);
+                tempOp = tempOp.substring(0,tempOp.length()-1);
+
+            }
             solved=true;
             String numbers[]=tempOp.split("÷");
             try{
                 double div=Double.parseDouble(numbers[0])/Double.parseDouble(numbers[1]);
                 bInput=div+"";
-                tempOp=bInput;
+                tempOp=bInput+c;
             }
             catch (Exception e){
                 //Display error
@@ -153,19 +260,32 @@ public class MainActivity extends AppCompatActivity {
         }
         else if(tempOp.split("\\+").length==2){
             solved=true;
+            String c ="";
+            if(tempOp.substring(tempOp.length()-1).equals("+") || tempOp.substring(tempOp.length()-1).equals("–") || tempOp.substring(tempOp.length()-1).equals("÷") || tempOp.substring(tempOp.length()-1).equals("×")){
+                c = tempOp.substring(tempOp.length()-1);
+                tempOp = tempOp.substring(0,tempOp.length()-1);
+
+            }
             String numbers[]=tempOp.split("\\+");
             try{
                 double sum=Double.parseDouble(numbers[0])+Double.parseDouble(numbers[1]);
                 bInput=sum+"";
-                tempOp=bInput;
+                tempOp=bInput+c;
             }
             catch (Exception e){
                 //Display error
             }
         }
-        else if(tempOp.split("\\-").length>1){
+        else if(tempOp.split("\\–").length>1){
             solved=true;
-            String numbers[]=tempOp.split("\\-");
+            String c ="";
+            if(tempOp.substring(tempOp.length()-1).equals("+") || tempOp.substring(tempOp.length()-1).equals("–") || tempOp.substring(tempOp.length()-1).equals("÷") || tempOp.substring(tempOp.length()-1).equals("×")){
+                c = tempOp.substring(tempOp.length()-1);
+                tempOp = tempOp.substring(0,tempOp.length()-1);
+
+            }
+            String numbers[]=tempOp.split("\\–");
+
             if(numbers[0]=="" && numbers.length==2){
                 numbers[0]=0+"";
             }
@@ -178,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
                     sub = -Double.parseDouble(numbers[1]) - Double.parseDouble(numbers[2]);
                 }
                 bInput=sub+"";
-                tempOp=bInput;
+                tempOp=bInput+c;
             }
             catch (Exception e){
                 //Display error
@@ -195,9 +315,11 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean lastCharOp(){
         int len = sInput.length()-1;
-        if(sInput.substring(len).equals("+") || sInput.substring(len).equals("-") || sInput.substring(len).equals("×") || sInput.substring(len).equals("÷") || sInput.substring(len).equals("=") || sInput.substring(len).equals("."))
-            return true;
-        else
+        if(len > 0)
+            if(sInput.substring(len).equals("+") || sInput.substring(len).equals("–") || sInput.substring(len).equals("×") || sInput.substring(len).equals("÷") || sInput.substring(len).equals("=") || sInput.substring(len).equals("."))
+                return true;
+            else
+                return false;
             return false;
     }
 
