@@ -39,185 +39,169 @@ public class MainActivity extends AppCompatActivity {
         Button button = (Button) view;
         String in = button.getText().toString();
 
+        //check if last entered character is an operator
         if(operator){
             if(!bInput.equals("Infinity")) {
-                bInput = "";
-                operator = false;
-                solved = false;
+                bInput = ""; operator = false; solved = false;
             }
         }
-        switch (in) {
-            case "=":
-                if(bInput.length()>0) {
-                   if (sInput.indexOf("=")==-1) {
-                        tempOp+=bInput;
-                        sInput+=bInput;
-                        solve();
-                        sInput += "=";
-                        sScreen.setText(sInput);
-                        bScreen.setText(bInput);
-                        solved=false;
-                    }
-                }
-                break;
-            case ".":
-                if(bInput.length()>0) {
-                    if (bInput.indexOf(".")==-1) {
-                        bInput += in;
-                        bScreen.setText(bInput);
-                    }
-                }
-                break;
-            case "+/-":
-                if(bInput.length()>0){
-                    String c = bInput.substring(0,1);
-                    if(c.equals("-")){
-                        bInput = bInput.substring(1);
-                    }
-                    else {
-                        bInput = "-" + bInput;
-                    }
-                    bScreen.setText(bInput);
-                    if(sInput.indexOf("=")!=-1){
-                        if(bInput.indexOf(".")!=-1){
-                            tempOp = bInput;
-                        }
-                        else{
-                            tempOp = bInput + ".0";
-                        }
-                    }
-                }
-                break;
-            case "⌫":
-                if(bInput.equals("Infinity")){}
-                else {
-                    int len1 = bInput.length();
-                    int len2 = sInput.length();
-                    int len3 = tempOp.length();
-                    if (len1 > 0) {
-                        if(len2 > 0) {
-                            if (!sInput.substring(len2 - 1).equals("=")) {
-                                String s = bInput.substring(0, len1 - 1);
-                                bInput = s;
-                                s = sInput.substring(0, len2 - 1);
-                                sInput = s;
-                                s = tempOp.substring(0, len3 - 1);
-                                tempOp = s;
-                                bScreen.setText(bInput);
-                            }
-                        }
-                        else{
-                            String s = bInput.substring(0, len1 - 1);
-                            bInput = s;
-                            bScreen.setText(bInput);
-                        }
-                        if(bInput.equals("")){
-                            bScreen.setText(R.string.defaultValue);
-                        }
-                    }
-                }
-                break;
-            case "C":
-                bInput = "";
-                sInput = "";
-                tempOp = "";
-                bScreen.setText(R.string.defaultValue);
-                sScreen.setText("");
-                break;
-            default:
-                if (sInput == null) {
-                    sInput = "";
-                    bScreen.setText(sInput);
-                }
-                if ((in.equals("+") || in.equals("–") || in.equals("×") || in.equals("÷"))){
-                    if (bInput.equals("Infinity")) {
-                        sInput = "";
-                        bInput = "";
-                        tempOp = "";
-                        sScreen.setText(sInput);
-                    }
-                    if(bInput.length()>0) {
-                        int len = sInput.length() - 1;
-                       // if (!lastCharOp()) {
-                        if(!solved) {
-                            if(bInput.indexOf("E")!=-1){
-                                sInput +=bInput;
-                            }
-                            else {
-                                BigDecimal bd = new BigDecimal(bInput);
-                                String t;
-                                t = (bd.stripTrailingZeros().toPlainString());
-                                sInput += t;
-                            }
-                        }
-                        if(sInput.indexOf("=")!=-1){
-                            if(bInput.indexOf("E")!=-1){
-                                sInput = bInput;
-                            }
-                            else {
-                                BigDecimal bd = new BigDecimal(bInput);
-                                String t;
-                                t = (bd.stripTrailingZeros().toPlainString());
-                                sInput = t;
-                            }
-                        }
 
-                        if(tempOp.indexOf(".")==-1) {
-                            tempOp += bInput;
-                            tempOp += in;
-                        }
-                        else if (tempOp.substring(tempOp.length()-1).equals("+") || tempOp.substring(tempOp.length()-1).equals("–") || tempOp.substring(tempOp.length()-1).equals("÷") || tempOp.substring(tempOp.length()-1).equals("×"))
-                        {
-                            tempOp += bInput;
-                            tempOp += in;
-                        }
-                        else{
-                            tempOp += in;
-                            if(!sInput.equals(bInput))
-                                tempOp += bInput;
-                        }
-                        sInput += in;
-
-                        solve();
-                        sScreen.setText(sInput);
-                        operator = true;
-                        //}
-                    }
+        if(in.equals("=")) {
+            if (bInput.length() > 0) {
+                if (sInput.indexOf("=") == -1) {
+                    tempOp += bInput; sInput += bInput;
+                    solve();
+                    sInput += "=";
+                    sScreen.setText(sInput); bScreen.setText(bInput);
+                    solved = false;
                 }
-                else {
-                    int len = sInput.length()-1;
-                    if(len>0) {
-                        if (sInput.substring(len).equals("=")) {
-                            sInput = "";
-                            bInput = "";
-                            tempOp = "";
-                            sScreen.setText(sInput);
-                        }
-                    }
-                    if(bInput.equals("Infinity")){
-                        sInput = "";
-                        bInput = "";
-                        tempOp = "";
-                        sScreen.setText(sInput);
-                        operator = false;
-                    }
-                    if(in.equals("0") && bInput.length()>0 && Double.parseDouble(bInput)==0);
-                    else {
-                        if(bInput.length()>0 && Double.parseDouble(bInput)==0 ){
-                            bInput = in;
-                            bScreen.setText(bInput);
-                        }
-                        else {
-                            if(bInput.length()<10) {
-                                bInput += in;
-                                bScreen.setText(bInput);
-                            }
-                        }
-                    }
-                }
-
+            }
         }
 
+        else if(in.equals(".")) {
+            if (bInput.length() > 0) {
+                if (bInput.indexOf(".") == -1) {
+                    bInput += in;
+                    bScreen.setText(bInput);
+                }
+            }
+        }
+
+        else if(in.equals("+/-")) {
+            if (bInput.length() > 0) {
+                String c = bInput.substring(0, 1);
+                if (c.equals("-")) {
+                    bInput = bInput.substring(1);
+                } else {
+                    bInput = "-" + bInput;
+                }
+                bScreen.setText(bInput);
+                if (sInput.indexOf("=") != -1) {
+                    if (bInput.indexOf(".") != -1) {
+                        tempOp = bInput;
+                    } else {
+                        tempOp = bInput + ".0";
+                    }
+                }
+            }
+        }
+
+        else if(in.equals("⌫")) {
+            if (bInput.equals("Infinity"));
+            else {
+                int len1 = bInput.length(); int len2 = sInput.length(); int len3 = tempOp.length();
+                if (len1 > 0) {
+                    if (len2 > 0) {
+                        if (!sInput.substring(len2 - 1).equals("=")) {
+                            String s = bInput.substring(0, len1 - 1);
+                            bInput = s;
+                            s = sInput.substring(0, len2 - 1);
+                            sInput = s;
+                            s = tempOp.substring(0, len3 - 1);
+                            tempOp = s;
+                            bScreen.setText(bInput);
+                        }
+                    } else {
+                        String s = bInput.substring(0, len1 - 1);
+                        bInput = s;
+                        bScreen.setText(bInput);
+                    }
+                    if (bInput.equals("")) {
+                        bScreen.setText(R.string.defaultValue);
+                    }
+                }
+            }
+        }
+
+        else if(in.equals("C")) {
+            bInput = ""; sInput = ""; tempOp = "";
+            bScreen.setText(R.string.defaultValue); sScreen.setText("");
+        }
+        else {
+            if (sInput == null) {
+                sInput = "";
+                bScreen.setText(sInput);
+            }
+            if ((in.equals("+") || in.equals("–") || in.equals("×") || in.equals("÷"))) {
+                if (bInput.equals("Infinity") || bInput.equals("-Infinity")) {
+                    sInput = "";
+                    bInput = "";
+                    tempOp = "";
+                    sScreen.setText(sInput);
+                }
+                if (bInput.length() > 0) {
+                    int len = sInput.length() - 1;
+                    // if (!lastCharOp()) {
+                    if (!solved) {
+                        if (bInput.indexOf("E") != -1) {
+                            sInput += bInput;
+                        } else {
+                            BigDecimal bd = new BigDecimal(bInput);
+                            String t;
+                            t = (bd.stripTrailingZeros().toPlainString());
+                            sInput += t;
+                        }
+                    }
+                    if (sInput.indexOf("=") != -1) {
+                        if (bInput.indexOf("E") != -1) {
+                            sInput = bInput;
+                        } else {
+                            BigDecimal bd = new BigDecimal(bInput);
+                            String t;
+                            t = (bd.stripTrailingZeros().toPlainString());
+                            sInput = t;
+                        }
+                    }
+
+                    if (tempOp.indexOf(".") == -1) {
+                        tempOp += bInput;
+                        tempOp += in;
+                    } else if (tempOp.substring(tempOp.length() - 1).equals("+") || tempOp.substring(tempOp.length() - 1).equals("–") || tempOp.substring(tempOp.length() - 1).equals("÷") || tempOp.substring(tempOp.length() - 1).equals("×")) {
+                        tempOp += bInput;
+                        tempOp += in;
+                    } else {
+                        tempOp += in;
+                        if (!sInput.equals(bInput))
+                            tempOp += bInput;
+                    }
+                    sInput += in;
+
+                    solve();
+                    sScreen.setText(sInput);
+                    operator = true;
+                    //}
+                }
+            } else {
+                int len = sInput.length() - 1;
+                if (len > 0) {
+                    if (sInput.substring(len).equals("=")) {
+                        sInput = "";
+                        bInput = "";
+                        tempOp = "";
+                        sScreen.setText(sInput);
+                    }
+                }
+                if (bInput.equals("Infinity")) {
+                    sInput = "";
+                    bInput = "";
+                    tempOp = "";
+                    sScreen.setText(sInput);
+                    operator = false;
+                }
+                if (in.equals("0") && bInput.length() > 0 && Double.parseDouble(bInput) == 0) ;
+                else {
+                    if (bInput.length() > 0 && bInput.indexOf(".") == -1 && Double.parseDouble(bInput) == 0) {
+                        bInput = in;
+                        bScreen.setText(bInput);
+                    } else {
+                        if (bInput.length() < 10) {
+                            bInput += in;
+                            bScreen.setText(bInput);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void solve(){
@@ -311,16 +295,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         bScreen.setText(bInput);
-    }
-
-    public boolean lastCharOp(){
-        int len = sInput.length()-1;
-        if(len > 0)
-            if(sInput.substring(len).equals("+") || sInput.substring(len).equals("–") || sInput.substring(len).equals("×") || sInput.substring(len).equals("÷") || sInput.substring(len).equals("=") || sInput.substring(len).equals("."))
-                return true;
-            else
-                return false;
-            return false;
     }
 
 }
